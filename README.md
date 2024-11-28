@@ -1,92 +1,151 @@
-### **Projeto de Monitoramento de Infraestrutura em Tempo Real (Logs e Métricas de Servidores)**
+# **Real-Time Infrastructure Monitoring System with Kafka, Spark Streaming, and Elasticsearch**
 
-Este projeto tem como objetivo a criação de um sistema que monitora a infraestrutura de servidores em tempo real, captando logs e métricas como CPU, memória, uso de disco, e identificando possíveis problemas, como gargalos ou falhas de desempenho. O sistema se baseia em uma arquitetura de processamento em tempo real com **Kafka** para ingestão de dados e **Apache Spark Streaming** para análise e detecção de anomalias.
+This repository provides a **template** for a real-time infrastructure monitoring system. The system uses **Apache Kafka** for data ingestion, **Apache Spark Streaming** for real-time processing, and **Elasticsearch** for storing logs and metrics. Additionally, the system sends real-time alerts to **Slack**, **email**, or **PagerDuty** when anomalies are detected.
 
-### **Arquitetura do Projeto**
+### **System Overview**
 
-1. **Coleta de Logs e Métricas dos Servidores:**
-   - Os dados de log e métricas do sistema (CPU, memória, uso de disco, etc.) são captados em tempo real. Para isso, ferramentas como **Telegraf**, **Prometheus**, ou **Logstash** podem ser configuradas para capturar esses dados diretamente dos servidores.
-   - Essas ferramentas enviam as métricas e logs para tópicos no Kafka, que são preparados para diferentes tipos de dados, como métricas de CPU, logs de erros de servidor, etc.
+This template can be used as a base to build an infrastructure monitoring system for servers or any other infrastructure. It is modular, with different components for data ingestion, processing, storage, and visualization. The system monitors metrics such as **CPU usage**, **memory usage**, and **error logs**.
 
-2. **Ingestão dos Dados com Kafka:**
-   - **Kafka** serve como um intermediário de alta performance para ingestão dos logs e métricas de vários servidores em tempo real.
-   - Cada tipo de dado (logs, CPU, memória, etc.) pode ser enviado para um **tópico** específico dentro do Kafka, permitindo que diferentes partes do sistema processem dados relevantes de maneira isolada.
-   - Kafka garante a escalabilidade do sistema, permitindo que vários produtores (servidores) e consumidores (sistemas de análise) possam operar em paralelo e em grande escala.
+### **Technologies Used**
+- **Apache Kafka**: For real-time data ingestion.
+- **Apache Spark Streaming**: For real-time data processing and analysis.
+- **Elasticsearch**: For storing logs and performing searches.
+- **Grafana** and **Kibana**: For data visualization.
+- **Slack**, **Email**, **PagerDuty**: For sending alerts.
+- **InfluxDB**: For storing time-series metrics.
 
-3. **Processamento em Tempo Real com Spark Streaming:**
-   - **Apache Spark Streaming** é usado para processar os dados contínuos recebidos do Kafka em tempo real.
-   - O Spark pode realizar tarefas como:
-     - **Agregação:** Cálculos médios, máximos, e mínimos de uso de CPU, memória, e disco em intervalos de tempo definidos.
-     - **Detecção de Anomalias:** Usar algoritmos simples como desvio padrão ou regras de limiar para identificar picos de uso anormal.
-     - **Filtragem:** Identificar logs de erro críticos, como falhas no sistema ou exceções graves, que podem indicar problemas iminentes.
-   - Spark pode detectar padrões de desempenho que estão fora dos valores aceitáveis e gerar eventos para notificação.
+---
 
-4. **Armazenamento de Dados e Histórico:**
-   - Para armazenar dados históricos de logs e métricas, você pode usar um banco de dados como **Elasticsearch** ou **InfluxDB**, permitindo consultas e análises posteriores.
-   - **Elasticsearch** é útil para dados não estruturados (logs), permitindo consultas flexíveis com uma busca poderosa. Já **InfluxDB** é otimizado para métricas temporais, como dados de monitoramento de CPU e memória.
+### **Prerequisites**
 
-5. **Geração de Alertas:**
-   - Sempre que Spark detecta um comportamento anômalo nos servidores (picos de CPU, uso de disco acima de determinado limite), o sistema gera alertas automáticos.
-   - Esses alertas podem ser enviados para equipes de operação via **Slack**, **e-mails** automáticos, ou mesmo **SMS**.
-   - Ferramentas como **Apache Airflow** podem ser integradas para orquestrar ações baseadas em eventos.
+Before running the system, you need to set up a few tools and services:
 
-6. **Visualização dos Dados:**
-   - Um **dashboard interativo** em tempo real é construído para visualizar as métricas e logs captados. Ferramentas como **Grafana** ou **Kibana** são ideais para isso.
-     - **Grafana** pode ser usado para visualizar as métricas de servidores (CPU, memória, etc.) captadas por Prometheus ou InfluxDB.
-     - **Kibana**, integrado com Elasticsearch, permite visualizar e analisar logs, além de criar dashboards com gráficos interativos.
-   - O dashboard permite a visualização das métricas em tempo real e pode exibir históricos e tendências, como:
-     - Uso médio de CPU e memória.
-     - Logs de erros mais frequentes.
-     - Evolução do consumo de recursos ao longo do tempo.
-     - Alertas ativos com a visualização do status dos servidores.
+1. **Apache Kafka**: For data ingestion.
+   - Download and follow installation instructions [here](https://kafka.apache.org/downloads).
+   
+2. **Apache Spark**: For real-time processing.
+   - Download and follow installation instructions [here](https://spark.apache.org/downloads.html).
+   
+3. **Elasticsearch**: For storing logs.
+   - Download and follow installation instructions [here](https://www.elastic.co/downloads/elasticsearch).
 
-### **Passos Detalhados para Implementação:**
+4. **Grafana** and **Kibana**: For data visualization.
+   - Download and follow installation instructions [here](https://grafana.com/get) and [here](https://www.elastic.co/downloads/kibana).
 
-#### 1. **Configuração de Kafka:**
-   - Crie tópicos no Kafka para diferentes tipos de logs e métricas (e.g., `cpu-usage`, `memory-usage`, `server-logs`).
-   - Configure ferramentas como **Logstash** ou **Telegraf** para enviar os dados coletados para esses tópicos Kafka.
+5. **Telegraf** or **Logstash**: For collecting metrics and logs.
+   - Download and follow installation instructions for [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) or [Logstash](https://www.elastic.co/downloads/logstash).
 
-#### 2. **Criação de Pipelines de Spark Streaming:**
-   - Construa jobs do **Spark Streaming** que leem dados dos tópicos Kafka.
-   - Crie um fluxo de processamento para cada métrica ou tipo de log. Por exemplo:
-     - **CPU Monitoring Job:** Lê do tópico `cpu-usage`, calcula o uso médio de CPU a cada 10 segundos e verifica se ultrapassa um limite definido (e.g., 85%).
-     - **Log Analysis Job:** Lê do tópico `server-logs`, filtra logs de erro e gera alertas quando um número significativo de erros ocorre em um curto período.
+---
 
-#### 3. **Detecção de Anomalias e Geração de Alertas:**
-   - No job de Spark Streaming, implemente regras para detecção de anomalias, como:
-     - Se a média de uso de CPU estiver acima de 90% por mais de 5 minutos, gera um alerta.
-     - Se houver mais de 10 logs de erro em menos de 1 minuto, sinalize um alerta de possível problema no servidor.
-   - Envie notificações usando integrações como **Slack**, **E-mail** ou **PagerDuty**.
+### **Configuration and Customization Required**
 
-#### 4. **Armazenamento e Visualização:**
-   - Armazene os dados processados no **Elasticsearch** ou **InfluxDB** para gerar dashboards históricos.
-   - Configure **Grafana** (para métricas) e **Kibana** (para logs) para criar visualizações em tempo real.
-   - Crie painéis que mostrem a saúde dos servidores, gráficos de tendências de consumo de recursos, e logs críticos.
+After cloning the repository, there are several configurations you need to adjust to tailor the system to your environment:
 
-#### 5. **Escalabilidade e Resiliência:**
-   - Garanta que o sistema seja **escalável**, permitindo adicionar mais servidores ao Kafka e Spark conforme o volume de dados aumenta.
-   - Configure Kafka com **replicação de partições** e use **checkpointing** no Spark para garantir resiliência em caso de falhas.
+#### **1. Kafka - Topic Configuration**
+The system uses Kafka for data ingestion, but you'll need to ensure that the correct topics exist in your Kafka cluster. To do this:
 
-### **Exemplo de Diagrama de Arquitetura:**
+- Open the Kafka console and create the necessary topics:
+  ```bash
+  kafka-topics.sh --create --topic cpu-usage --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+  kafka-topics.sh --create --topic memory-usage --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+  kafka-topics.sh --create --topic server-logs --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+  ```
 
-```
-[Sensores de Servidores] ---> [Telegraf/Logstash] ---> [Kafka] ---> [Spark Streaming] ---> [Elasticsearch/InfluxDB] ---> [Grafana/Kibana]
+#### **2. Spark - Streaming Configuration**
+In the `streaming/spark-streaming/spark_streaming.py` file, you’ll find the Spark configuration to consume data from Kafka. Make sure the Kafka server address and topics are correct:
 
-                                                                  ---> [Alertas] ---> [Slack/E-mail/SMS]
+```python
+kafka_stream = KafkaUtils.createStream(ssc, "localhost:2181", "spark-streaming", {
+    "cpu-usage": 1, 
+    "memory-usage": 1,
+    "server-logs": 1
+})
 ```
 
-### **Benefícios e Desafios:**
+Adjust the **Zookeeper** address (`localhost:2181`) and the **Kafka topics** as needed.
 
-- **Benefícios:**
-  - Monitoramento contínuo e em tempo real.
-  - Detecção de anomalias rapidamente, prevenindo falhas de desempenho.
-  - Armazenamento de histórico para análise futura de padrões.
-  - Visualização em tempo real dos dados de performance e logs críticos.
+#### **3. Elasticsearch - Index Creation**
+Before collecting logs into Elasticsearch, you need to make sure the appropriate indexes are created. This is done by the script `storage/elasticsearch/init_es.py`.
 
-- **Desafios:**
-  - Configuração de um ambiente Kafka e Spark distribuído pode ser complexa.
-  - Latência no processamento pode ser um problema em sistemas muito grandes.
-  - Necessidade de integração entre várias ferramentas (Kafka, Spark, Prometheus, Elasticsearch, etc.).
+Make sure the `index_creation.json` file is configured correctly (as mentioned earlier) and execute the script to create the indexes:
 
-### **Impacto e Nível de Reconhecimento:**
-   - Esse projeto demonstra conhecimentos avançados em **processamento em tempo real**, **ferramentas de big data** e **monitoramento de sistemas**. Recrutadores e engenheiros de dados em empresas de tecnologia, principalmente aquelas focadas em infraestrutura e operação de sistemas escaláveis, valorizam fortemente essas habilidades.
+```bash
+python storage/elasticsearch/init_es.py
+```
+
+#### **4. Alerts - Configuring Slack, Email, and PagerDuty**
+The system sends alerts when anomalies are detected. You can configure these alerts in the following files:
+
+- **Slack**: In the `alerts/slack/slack_alert.py` file, configure the Slack authentication token:
+  
+  ```python
+  slack_token = "YOUR_SLACK_TOKEN"
+  slack_channel = "#alerts"
+  ```
+
+- **Email**: In the `alerts/email/email_alert.py` file, configure the SMTP server and email credentials:
+  
+  ```python
+  smtp_server = "smtp.yourdomain.com"
+  smtp_port = 587
+  smtp_user = "your_email@example.com"
+  smtp_password = "your_email_password"
+  ```
+
+- **PagerDuty**: In the `alerts/pagerduty/pagerduty_alert.py` file, configure the PagerDuty API token:
+  
+  ```python
+  pagerduty_api_key = "YOUR_API_KEY"
+  pagerduty_service_id = "YOUR_SERVICE_ID"
+  ```
+
+#### **5. Grafana and Kibana Configuration**
+To visualize the collected metrics and logs, you can set up **Grafana** and **Kibana**:
+
+- **Grafana**: Create dashboards by connecting Grafana to InfluxDB and visualize metrics such as CPU usage, memory usage, etc.
+
+- **Kibana**: Set up Kibana to visualize logs from Elasticsearch and create interactive charts.
+
+#### **6. Telegraf or Logstash for Data Collection**
+Depending on which tool you choose (Telegraf or Logstash), configure them to collect data from your servers. For example, if you're using Telegraf, configure the `telegraf.conf` file with the data sources and output destinations.
+
+---
+
+### **Running the System**
+
+After configuring all the components, you can run the system as follows:
+
+1. **Start Kafka**:
+   - Start **Zookeeper**:
+     ```bash
+     bin/zookeeper-server-start.sh config/zookeeper.properties
+     ```
+   - Start **Kafka**:
+     ```bash
+     bin/kafka-server-start.sh config/server.properties
+     ```
+
+2. **Start Spark Streaming**:
+   - Run the Spark Streaming script to consume data from Kafka and process it:
+     ```bash
+     spark-submit --master local[2] streaming/spark-streaming/spark_streaming.py
+     ```
+
+3. **Start Elasticsearch**:
+   - Start Elasticsearch:
+     ```bash
+     ./bin/elasticsearch
+     ```
+
+4. **Start Telegraf or Logstash**:
+   - Configure and start Telegraf or Logstash to collect data from your system.
+
+---
+
+### **Final Considerations**
+
+This template serves as a starting point for a real-time infrastructure monitoring system. To use it in production, you'll need to adjust configurations according to your specific environment, such as servers, data volume, and alerting preferences. The system can be easily scaled to handle large volumes of data using Kafka, Spark, and Elasticsearch clusters.
+
+If you need assistance or have any questions, feel free to open an issue in this repository.
+
+---

@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  elasticsearch:
+    image: elasticsearch:7.10.2
+    environment:
+      discovery.type: single-node
+    ports:
+      - 9200:9200
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+volumes:
+  es_data:

@@ -1,0 +1,20 @@
+{
+    "dashboard": {
+      "title": "Infraestrutura",
+      "panels": [
+        {
+          "type": "graph",
+          "title": "CPU Usage",
+          "datasource": "InfluxDB",
+          "targets": [
+            {
+              "measurement": "cpu_usage",
+              "fields": ["value"],
+              "groupBy": [{ "time": "1m" }]
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

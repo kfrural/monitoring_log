@@ -1,0 +1,39 @@
+{
+    "objects": [
+      {
+        "type": "dashboard",
+        "dashboard": {
+          "title": "Infra Metrics Dashboard",
+          "hits": 0,
+          "description": "Dashboard para monitoramento de métricas de infraestrutura",
+          "panelsJSON": "[{\"col\":1,\"id\":\"cpu_usage\",\"panelIndex\":1,\"row\":1,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\",\"version\":1}, {\"col\":1,\"id\":\"memory_usage\",\"panelIndex\":2,\"row\":5,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\",\"version\":1}, {\"col\":1,\"id\":\"logs_per_second\",\"panelIndex\":3,\"row\":9,\"size_x\":12,\"size_y\":4,\"type\":\"visualization\",\"version\":1}]",
+          "version": 1
+        }
+      },
+      {
+        "type": "visualization",
+        "visualization": {
+          "title": "Uso de CPU",
+          "visState": "{\"title\":\"Uso de CPU\",\"type\":\"metric\",\"params\":{\"metrics\":[{\"field\":\"cpu.usage\",\"id\":\"1\",\"type\":\"avg\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"field\":\"cpu.usage\",\"type\":\"avg\"}],\"type\":\"metric\"}",
+          "version": 1
+        }
+      },
+      {
+        "type": "visualization",
+        "visualization": {
+          "title": "Uso de Memória",
+          "visState": "{\"title\":\"Uso de Memória\",\"type\":\"metric\",\"params\":{\"metrics\":[{\"field\":\"memory.usage\",\"id\":\"1\",\"type\":\"avg\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"field\":\"memory.usage\",\"type\":\"avg\"}],\"type\":\"metric\"}",
+          "version": 1
+        }
+      },
+      {
+        "type": "visualization",
+        "visualization": {
+          "title": "Logs por Segundo",
+          "visState": "{\"title\":\"Logs por Segundo\",\"type\":\"timeseries\",\"params\":{\"interval\":\"auto\",\"metrics\":[{\"field\":\"@timestamp\",\"id\":\"1\",\"type\":\"count\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"field\":\"@timestamp\",\"type\":\"date_histogram\",\"interval\":\"auto\"}],\"type\":\"timeseries\"}",
+          "version": 1
+        }
+      }
+    ]
+  }
+  

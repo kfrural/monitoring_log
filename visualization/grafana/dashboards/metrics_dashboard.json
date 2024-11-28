@@ -1,0 +1,128 @@
+{
+    "dashboard": {
+      "id": null,
+      "uid": "infra-metrics-dashboard",
+      "title": "Infra Metrics Dashboard",
+      "tags": ["infrastructure", "metrics"],
+      "timezone": "browser",
+      "schemaVersion": 27,
+      "version": 1,
+      "refresh": "10s",
+      "panels": [
+        {
+          "type": "graph",
+          "title": "CPU Usage",
+          "id": 1,
+          "targets": [
+            {
+              "measurement": "cpu",
+              "fields": [
+                "usage_user",
+                "usage_system",
+                "usage_idle"
+              ],
+              "groupBy": [
+                {
+                  "type": "time",
+                  "interval": "10s"
+                }
+              ]
+            }
+          ],
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "percent",
+              "label": "CPU Usage"
+            }
+          ]
+        },
+        {
+          "type": "graph",
+          "title": "Memory Usage",
+          "id": 2,
+          "targets": [
+            {
+              "measurement": "mem",
+              "fields": [
+                "used",
+                "total"
+              ],
+              "groupBy": [
+                {
+                  "type": "time",
+                  "interval": "10s"
+                }
+              ]
+            }
+          ],
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "label": "Memory Usage"
+            }
+          ]
+        },
+        {
+          "type": "graph",
+          "title": "Disk I/O",
+          "id": 3,
+          "targets": [
+            {
+              "measurement": "diskio",
+              "fields": [
+                "read_bytes",
+                "write_bytes"
+              ],
+              "groupBy": [
+                {
+                  "type": "time",
+                  "interval": "10s"
+                }
+              ]
+            }
+          ],
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "label": "Disk I/O"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "System Load",
+          "id": 4,
+          "targets": [
+            {
+              "measurement": "system",
+              "fields": [
+                "load1",
+                "load5",
+                "load15"
+              ]
+            }
+          ],
+          "valueName": "avg",
+          "stat": "current",
+          "decimals": 2
+        }
+      ]
+    },
+    "overwrite": false
+  }
+  

@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  kafka:
+    image: wurstmeister/kafka:latest
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENER_NAMES: INSIDE
+      KAFKA_LISTENER_PORT: 9093
+      KAFKA_LISTENER_HOSTNAME: kafka
+      KAFKA_LISTENER_EXTERNAL: OUTSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_INTERNAL: INSIDE://kafka:9093
+    ports:
+      - 9093:9093
+    networks:
+      - app-network
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_LISTENERS: INSIDE://zookeeper:2181
+      ZOOKEEPER_ADVERTISED_LISTENERS: INSIDE://zookeeper:2181
+      ZOOKEEPER_LISTENER_PORT: 2181
+    ports:
+      - 2181:2181
+    networks:
+      - app-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+  influxdb:
+    image: influxdb:2.0
+    environment:
+      INFLUXDB_DB: "infra_metrics"
+      INFLUXDB_ADMIN_USER: "admin"
+      INFLUXDB_ADMIN_PASSWORD: "admin123"
+    ports:
+      - "8086:8086"
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    depends_on:
+      - influxdb
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.2
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    networks:
+      - app-network
+    depends_on:
+      - kafka
+      - elasticsearch
+
+  telegraf:
+    image: telegraf:latest
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+    networks:
+      - app-network
+    depends_on:
+      - influxdb
+
+  app:
+    build: ./app
+    volumes:
+      - ./app:/app
+    command: ["python", "kafka_spark_stream.py"]
+    networks:
+      - app-network
+    depends_on:
+      - kafka
+      - elasticsearch
+      - influxdb
+
+networks:
+  app-network:
+    driver: bridge
